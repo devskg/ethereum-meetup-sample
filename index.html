@@ -4,15 +4,18 @@
 <script type='text/javascript'>
 
 function get() {
-	var param = document.getElementById('query').value;
-	var res = contracts['Sample'].contract.get();
-	document.getElementById('queryres').innerText = res;
+	var res = web3.eth.getBalance(web3.eth.accounts[1]);
+	document.getElementById('balance').innerText = res;
 }
 
-function set() {
-	web3.eth.defaultAccount = web3.eth.accounts[0];
-	var key = document.getElementById('key').value;
-	var res = contracts['Sample'].contract.set(key);
+function run(winningBet) {
+	web3.eth.defaultAccount = web3.eth.accounts[3];
+	var res = contracts['SuperOracle'].contract.run(winningBet);
+}
+	
+function makeBet(bet) {
+	web3.eth.defaultAccount = web3.eth.accounts[1];
+	var res = contracts['SuperOracle'].contract.makeBet(bet, {value: 10});
 }
 
 </script>
@@ -20,14 +23,19 @@ function set() {
 <body bgcolor='#E6E6FA'>
 	<h3>Sample Ratings</h3>
 <div>
-Store: asdfasdf
-	<input type='number' id='key'>
-	<button onclick='set()'>Save</button>
+Run oracle
+	<button onclick='run(true)'>True</button>
+	<button onclick='run(false)'>False</button>
 </div>
 <div>
-Query:
-	<input value='get' type='button' id='query' onclick='get()' />
+Make bet:
+	<input value='True' type='button' id='query' onclick='makeBet(true)' />
+	<input value='False' type='button' id='query' onclick='makeBet(false)' />
 	<div id='queryres'></div>
 </div>
+	<div>
+		<button onclick='get()'>Get balance</button>
+		<span id="balance"></span>
+	</div>
 </body>
 </html>

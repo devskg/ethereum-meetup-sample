@@ -1,4 +1,4 @@
-//Sample contract
+//SuperOracle contract
 contract SuperOracle
 {
 	struct Bet {
@@ -8,23 +8,27 @@ contract SuperOracle
 	}
 	
 	mapping (uint => Bet) bets;
-	uint size;
-	address oracle = 0x004f71832d8a74485841f56e31d5ec18ef3bf470;
+	uint size = 0;
+	address oracle = 0xb0dcdc575ef06dc30aaea069d8043c9d463c931c;
 	
 	function SuperOracle () {
 	
 	}
+
 	
-	function makeBet (bool bet) {
-		if (msg.value <= 0) return;
+	function makeBet (bool bet) returns (uint) {
+		if (msg.value <= 0) {
+			return 0;
+		}
 		Bet newBet = bets[++size];		
-	
+		
 		newBet.betAddress = msg.sender;
 		newBet.amount = msg.value;
 		newBet.bet = bet;
+		return msg.value;
 	}
 	
-	function run (bool result) {
+	function run (bool result) returns (uint) {
 		if (oracle != msg.sender) return;		
 		
 		uint totalAmount;
@@ -36,6 +40,12 @@ contract SuperOracle
 			}
 		}
 		uint winnerResult = totalAmount / winnersAmount;
-		msg.sender.send(1);
+		for (i = 0; i < size; i++) {
+			if (bets[i].bet == result) {
+				bets[i].betAddress.send(winnerResult);
+			}
+		}
+		//msg.sender.send(1);
+		return winnerResult;
 	}
 }
